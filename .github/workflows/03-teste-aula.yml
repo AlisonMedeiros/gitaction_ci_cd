@@ -9,7 +9,7 @@ env:
   NOME_BRANCH: "aula-teste"
   AMBIENTE: "teste"
   VERSAO: "0.1.0"
-  DATA_TESTE: ${{ format('{0:yyyy-MM-dd HH:mm:ss}', github.event.head_commit.timestamp) }}
+  DATA_TESTE: ${{ github.event.head_commit.timestamp || '' }}
 
 jobs:
   teste-aula:
@@ -17,7 +17,7 @@ jobs:
     
     env:
       JOB_ID: "teste-aula-001"
-      TIMESTAMP: ${{ github.event.head_commit.timestamp }}
+      TIMESTAMP: ${{ github.event.head_commit.timestamp || '' }}
     
     steps:
       - name: Checkout do código
