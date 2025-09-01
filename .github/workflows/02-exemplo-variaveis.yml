@@ -1,0 +1,116 @@
+name: 02 - Exemplo de Variáveis
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+
+# Variáveis globais do workflow
+env:
+  # Variáveis de ambiente customizadas
+  NOME_APLICACAO: "Minha Aplicação"
+  VERSAO: "2.1.0"
+  AMBIENTE: "produção"
+  
+  # Variáveis de sistema
+  NODE_VERSION: "18"
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  exemplo-variaveis:
+    runs-on: ubuntu-latest
+    
+    # Variáveis específicas do job
+    env:
+      JOB_ID: "exemplo-001"
+      DATA_EXECUCAO: ${{ format('{0:yyyy-MM-dd HH:mm:ss}', github.event.head_commit.timestamp) }}
+    
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          
+      - name: Exibe variáveis de ambiente
+        run: |
+          echo "=== VARIÁVEIS DE AMBIENTE ==="
+          echo "NOME_APLICACAO: ${{ env.NOME_APLICACAO }}"
+          echo "VERSAO: ${{ env.VERSAO }}"
+          echo "AMBIENTE: ${{ env.AMBIENTE }}"
+          echo "NODE_VERSION: ${{ env.NODE_VERSION }}"
+          echo "PYTHON_VERSION: ${{ env.PYTHON_VERSION }}"
+          echo "JOB_ID: ${{ env.JOB_ID }}"
+          echo "DATA_EXECUCAO: ${{ env.DATA_EXECUCAO }}"
+          
+      - name: Exibe variáveis do contexto GitHub
+        run: |
+          echo "=== VARIÁVEIS DO GITHUB ==="
+          echo "Repository: ${{ github.repository }}"
+          echo "Repository Owner: ${{ github.repository_owner }}"
+          echo "Repository Name: ${{ github.event.repository.name }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit SHA: ${{ github.sha }}"
+          echo "Commit Message: ${{ github.event.head_commit.message }}"
+          echo "Actor: ${{ github.actor }}"
+          echo "Event: ${{ github.event_name }}"
+          echo "Workflow: ${{ github.workflow }}"
+          echo "Job: ${{ github.job }}"
+          echo "Run ID: ${{ github.run_id }}"
+          echo "Run Number: ${{ github.run_number }}"
+          
+      - name: Exibe variáveis do contexto Runner
+        run: |
+          echo "=== VARIÁVEIS DO RUNNER ==="
+          echo "OS: ${{ runner.os }}"
+          echo "Architecture: ${{ runner.arch }}"
+          echo "Runner Name: ${{ runner.name }}"
+          echo "Workspace: ${{ runner.workspace }}"
+          echo "Temp: ${{ runner.temp }}"
+          echo "Tool Cache: ${{ runner.tool_cache }}"
+          
+      - name: Exibe variáveis do contexto Secrets
+        run: |
+          echo "=== SECRETS (se configurados) ==="
+          # Nota: Secrets só são exibidos se estiverem configurados
+          if [ -n "${{ secrets.MY_SECRET }}" ]; then
+            echo "MY_SECRET está configurado"
+          else
+            echo "MY_SECRET não está configurado"
+          fi
+          
+      - name: Cria arquivo de configuração
+        run: |
+          cat > config.json << EOF
+          {
+            "aplicacao": "${{ env.NOME_APLICACAO }}",
+            "versao": "${{ env.VERSAO }}",
+            "ambiente": "${{ env.AMBIENTE }}",
+            "repositorio": "${{ github.repository }}",
+            "branch": "${{ github.ref_name }}",
+            "commit": "${{ github.sha }}",
+            "executado_por": "${{ github.actor }}",
+            "data_execucao": "${{ env.DATA_EXECUCAO }}"
+          }
+          EOF
+          
+          echo "Arquivo config.json criado:"
+          cat config.json
+          
+      - name: Testa variáveis em diferentes contextos
+        run: |
+          # Variáveis em shell script
+          MEU_NOME="GitHub Actions"
+          echo "Nome local: $MEU_NOME"
+          echo "Nome global: ${{ env.NOME_APLICACAO }}"
+          
+          # Usando variáveis em comandos
+          echo "Executando com versão: ${{ env.VERSAO }}"
+          echo "Ambiente atual: ${{ env.AMBIENTE }}"

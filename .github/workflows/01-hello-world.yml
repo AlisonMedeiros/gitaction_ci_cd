@@ -10,6 +10,12 @@ on:
   # Permite que o workflow seja executado manualmente a partir da interface do GitHub
   workflow_dispatch:
 
+# Variáveis globais do workflow
+env:
+  NOME_PROJETO: "GitHub Actions CI/CD"
+  VERSAO: "1.0.0"
+  AMBIENTE: "desenvolvimento"
+
 # Jobs: Um workflow é composto por um ou mais jobs, que rodam em paralelo por padrão.
 jobs:
   # Nome do nosso primeiro job
@@ -17,11 +23,45 @@ jobs:
     # Runner: Define a máquina virtual onde o job será executado. 'ubuntu-latest' é uma boa escolha padrão.
     runs-on: ubuntu-latest
 
+    # Variáveis específicas do job
+    env:
+      NOME_JOB: "primeiro-job"
+      TIMESTAMP: ${{ github.event.head_commit.timestamp }}
+
     # Steps: Uma sequência de tarefas que serão executadas no job.
     steps:
       - name: Imprime uma mensagem de boas-vindas
         run: echo "👋 Olá, Mundo! Meu primeiro workflow com GitHub Actions está funcionando!"
+      
       - name: Mostra o diretório de trabalho
         run: pwd
+      
       - name: Lista os arquivos no diretório home
         run: ls ~
+      
+      - name: Exibe variáveis do projeto
+        run: |
+          echo "📋 Informações do Projeto:"
+          echo "Nome: ${{ env.NOME_PROJETO }}"
+          echo "Versão: ${{ env.VERSAO }}"
+          echo "Ambiente: ${{ env.AMBIENTE }}"
+          echo "Job: ${{ env.NOME_JOB }}"
+          echo "Timestamp: ${{ env.TIMESTAMP }}"
+      
+      - name: Exibe variáveis do GitHub
+        run: |
+          echo "🔧 Variáveis do GitHub:"
+          echo "Repository: ${{ github.repository }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit SHA: ${{ github.sha }}"
+          echo "Actor: ${{ github.actor }}"
+          echo "Event: ${{ github.event_name }}"
+      
+      - name: Cria arquivo com variáveis
+        run: |
+          echo "NOME_PROJETO=${{ env.NOME_PROJETO }}" >> variaveis.txt
+          echo "VERSAO=${{ env.VERSAO }}" >> variaveis.txt
+          echo "AMBIENTE=${{ env.AMBIENTE }}" >> variaveis.txt
+          echo "REPOSITORIO=${{ github.repository }}" >> variaveis.txt
+          echo "BRANCH=${{ github.ref_name }}" >> variaveis.txt
+          cat variaveis.txt
