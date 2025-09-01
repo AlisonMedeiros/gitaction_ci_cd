@@ -1,0 +1,23 @@
+# Nome do Workflow
+name: Aula 02 - Exemplo Básico de Workflow Dispatch
+
+# Gatilho (Trigger):
+on:
+  # O gatilho 'workflow_dispatch' é especial porque não é automático.
+  # Ele adiciona um botão "Run workflow" na aba "Actions" do repositório no GitHub.
+  # Isso permite que qualquer pessoa com permissão de escrita no repositório
+  # inicie a execução do workflow manualmente.
+  # É perfeito para tarefas que exigem uma decisão humana, como:
+  # - Fazer o deploy para um ambiente de produção.
+  # - Rodar um conjunto de testes de longa duração.
+  # - Executar um script de manutenção no banco de dados.
+  workflow_dispatch:
+
+jobs:
+  manual-trigger-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Exibe mensagem de execução manual
+        run: |
+          echo "Este workflow foi acionado manualmente!"
+          echo "Iniciado por: ${{ github.actor }}"

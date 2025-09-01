@@ -1,0 +1,29 @@
+# Nome do Workflow
+name: Aula 02 - Exemplo de Push Ignorando Branches
+
+# Gatilho (Trigger):
+on:
+  push:
+    # A chave 'branches-ignore' funciona como o oposto de 'branches': é uma "lista de exclusão" (block list).
+    # O workflow será acionado por um push para QUALQUER branch, a menos que o nome da branch
+    # corresponda a um dos padrões definidos nesta lista.
+    # É uma estratégia útil para workflows que devem rodar em todas as branches de desenvolvimento
+    # (ex: 'feature/nova-tela', 'bugfix/ajuste-css'), mas que devem ser explicitamente
+    # ignorados em branches críticas como 'main' ou 'hotfix', que podem ter seus próprios pipelines de deploy.
+    branches-ignore:
+      - main          # Ignora pushes para a branch 'main'
+      - 'hotfix/**'   # Ignora pushes para qualquer branch que comece com 'hotfix/'
+
+# Jobs que o workflow executará
+jobs:
+  # Nome do job
+  log-ignored-branch-info:
+    # Máquina virtual onde o job será executado
+    runs-on: ubuntu-latest
+
+    # Passos (steps) que o job executará em sequência
+    steps:
+      - name: Exibe informações da branch
+        run: |
+          echo "Workflow acionado por um push na branch: ${{ github.ref_name }}"
+          echo "Este job NUNCA executa em 'main' ou em branches 'hotfix/**'."

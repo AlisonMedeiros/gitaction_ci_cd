@@ -1,0 +1,32 @@
+# Nome do Workflow
+name: Aula 02 - Exemplo Completo de Pull Request
+
+# Gatilho (Trigger):
+on:
+  pull_request:
+    # Este é um exemplo completo que combina múltiplos filtros para um controle preciso.
+    # O workflow só será acionado se TODAS as condições (types, branches, paths) forem atendidas.
+
+    # CONDIÇÃO 1: O evento do PR deve ser um dos seguintes.
+    types: [opened, synchronize, reopened]
+
+    # CONDIÇÃO 2: O PR deve ser direcionado para uma destas branches.
+    branches:
+      - main
+      - 'release/**'
+
+    # CONDIÇÃO 3: O PR deve conter alterações em pelo menos um arquivo dentro destes paths.
+    # Isso otimiza o pipeline, evitando rodar testes de backend se apenas a documentação mudou.
+    paths:
+      - 'src/**'
+      - 'tests/**'
+
+jobs:
+  complex-pr-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Exibe informações do gatilho
+        run: |
+          echo "Workflow acionado por um evento de PR (${{ github.event.action }})."
+          echo "O PR #${{ github.event.pull_request.number }} está direcionado para a branch '${{ github.base_ref }}'."
+          echo "As alterações foram detectadas nos diretórios 'src/**' ou 'tests/**'."

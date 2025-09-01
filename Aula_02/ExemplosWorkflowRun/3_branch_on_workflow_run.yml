@@ -1,0 +1,45 @@
+name: 3. Branch on Workflow Run
+
+# Este workflow demonstra como usar filtros de branch (`branches` e `branches-ignore`)
+# no gatilho `workflow_run`. Isso permite um controle extremamente poderoso, garantindo
+# que uma ação (como um deploy) só seja acionada quando o workflow de origem
+# for executado em uma branch específica.
+#
+# Caso de uso principal:
+# - CI/CD: Executar um workflow de deploy para produção SOMENTE QUANDO o workflow de
+#   testes e build for concluído com SUCESSO na branch `main`. Isso evita deploys
+#   acidentais a partir de branches de feature.
+
+on:
+  workflow_run:
+    # O nome do workflow que acionará este.
+    # IMPORTANTE: Substitua pelo nome exato do seu workflow de CI.
+    workflows: ["Meu Primeiro Workflow de CI"]
+
+    # O evento que aciona. 'completed' significa que ele rodará após o outro workflow terminar.
+    types:
+      - completed
+
+    # AQUI ESTÁ A CHAVE: Filtro de Branch
+    # Este workflow só será acionado se o workflow "Meu Primeiro Workflow de CI"
+    # foi executado na branch `main`. Se o mesmo workflow rodar em uma branch
+    # `develop` ou `feature/nova-func`, este workflow aqui será ignorado.
+    branches:
+      - main
+
+jobs:
+  # Este job simula um deploy para produção, que só deve ocorrer a partir da branch `main`.
+  deploy-to-production:
+    runs-on: ubuntu-latest
+    # Adicionamos uma verificação dupla para garantir que o deploy só ocorra
+    # se o workflow anterior teve sucesso.
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Deploy para Produção
+        run: |
+          echo "🚀 O workflow '${{ github.event.workflow_run.workflow.name }}' foi concluído com sucesso na branch 'main'."
+          echo "Iniciando o processo de deploy para o ambiente de produção..."
+          # Aqui entrariam os passos reais de deploy:
+          # - actions/checkout@v3
+          # - aws-actions/configure-aws-credentials@v2
+          # - aws s3 sync . s3://meu-bucket-de-producao

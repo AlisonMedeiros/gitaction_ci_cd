@@ -1,0 +1,29 @@
+# Nome do Workflow
+name: Aula 02 - Exemplo de Push com Filtro de Path
+
+# Gatilho (Trigger):
+on:
+  push:
+    # O filtro 'paths' otimiza a execução de workflows.
+    # Ele aciona o workflow APENAS se um commit contiver alterações
+    # em arquivos que correspondam aos padrões listados.
+    # Isso é extremamente útil em monorepos (repositórios com múltiplos projetos),
+    # pois permite rodar o pipeline de backend apenas quando o código do backend muda,
+    # e não quando o frontend ou a documentação são alterados.
+    paths:
+      - 'backend/**'      # Executa se qualquer arquivo dentro do diretório 'backend' for alterado.
+      - '**.md'           # Executa se qualquer arquivo com a extensão .md for alterado em qualquer lugar do repositório.
+
+# Jobs que o workflow executará
+jobs:
+  # Nome do job
+  log-path-info:
+    # Máquina virtual onde o job será executado
+    runs-on: ubuntu-latest
+
+    # Passos (steps) que o job executará em sequência
+    steps:
+      - name: Exibe informações do path
+        run: |
+          echo "Workflow acionado por uma alteração em 'backend/**' ou em arquivos '.md'."
+          echo "Verifique os arquivos modificados no commit para confirmar."

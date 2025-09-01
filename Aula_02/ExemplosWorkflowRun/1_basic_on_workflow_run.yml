@@ -1,0 +1,44 @@
+name: 1. Basic Workflow Run
+
+# O gatilho `workflow_run` é usado para encadear workflows. Ele permite que um workflow
+# seja acionado pela conclusão ou solicitação de outro workflow no mesmo repositório.
+# É ideal para cenários como:
+# - Deploy para produção SOMENTE APÓS o workflow de testes passar.
+# - Notificar uma equipe sobre o resultado (sucesso ou falha) de um pipeline importante.
+# - Coletar artefatos de múltiplos workflows de build para um único workflow de release.
+on:
+  workflow_run:
+    # A chave 'workflows' é uma lista com os nomes dos workflows que podem acionar este.
+    # O nome deve corresponder exatamente à chave 'name' definida no arquivo do workflow alvo.
+    # IMPORTANTE: Substitua "Meu Primeiro Workflow de CI" pelo nome exato do seu workflow de CI.
+    workflows: ["Meu Primeiro Workflow de CI"]
+
+    # A chave 'types' especifica o evento do ciclo de vida do workflow alvo que acionará este.
+    # - 'completed': Aciona quando o workflow alvo termina (seja com sucesso, falha, etc.). É o padrão.
+    # - 'requested': Aciona quando o workflow alvo é iniciado.
+    types:
+      - completed
+
+jobs:
+  # Este job é um exemplo de ação pós-execução que só roda se o workflow anterior foi concluído com SUCESSO.
+  # É um padrão comum para realizar um deploy, notificar sobre o sucesso ou iniciar a próxima etapa de um processo.
+  on-success:
+    runs-on: ubuntu-latest
+    # A condição `if` é a chave para a lógica condicional.
+    # Ela verifica o campo `conclusion` do evento `workflow_run`. Este campo contém o resultado final
+    # do workflow que acionou este. Os valores possíveis são: 'success', 'failure', 'cancelled', 'skipped'.
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Ação em caso de sucesso
+        # Usamos o contexto para criar uma mensagem dinâmica e informativa.
+        # `github.event.workflow_run.workflow.name` pega o nome do workflow que nos acionou.
+        run: echo "✅ O workflow '${{ github.event.workflow_run.workflow.name }}' foi concluído com sucesso."
+
+  # Este job é um exemplo de ação que só roda se o workflow anterior FALHOU.
+  # É ideal para enviar notificações de alerta, criar issues ou até mesmo iniciar um processo de rollback.
+  on-failure:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    steps:
+      - name: Ação em caso de falha
+        run: echo "❌ O workflow '${{ github.event.workflow_run.workflow.name }}' falhou. Notificando a equipe de plantão!"

@@ -1,0 +1,29 @@
+# Nome do Workflow
+name: Aula 02 - Exemplo de Gatilho Agendado (Cron)
+
+# Gatilho (Trigger):
+on:
+  # O gatilho 'schedule' permite que você execute um workflow em horários agendados.
+  # Ele usa a sintaxe cron, que é um padrão para definir agendamentos de tarefas.
+  schedule:
+    # A sintaxe cron tem 5 campos: minuto, hora, dia do mês, mês e dia da semana.
+    # ┌───────────── minuto (0 - 59)
+    # │ ┌───────────── hora (0 - 23)
+    # │ │ ┌───────────── dia do mês (1 - 31)
+    # │ │ │ ┌───────────── mês (1 - 12)
+    # │ │ │ │ ┌───────────── dia da semana (0 - 6, onde 0 é Domingo)
+    # │ │ │ │ │
+    # * * * * *
+    #
+    # Este exemplo executa o workflow às 03:15 todos os dias.
+    # IMPORTANTE: O horário é sempre UTC. Para o Brasil (UTC-3), isso seria 00:15.
+    - cron: '15 3 * * *'
+
+jobs:
+  run-scheduled-task:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Executa uma tarefa agendada
+        run: |
+          echo "Este job foi acionado por um agendamento (cron)!"
+          echo "A hora atual no runner é: $(date)"

@@ -1,0 +1,26 @@
+# Nome do Workflow
+name: Aula 02 - Exemplo de PR com Filtro de Branch
+
+# Gatilho (Trigger):
+on:
+  pull_request:
+    # A chave 'branches' no gatilho 'pull_request' permite filtrar pela branch de DESTINO.
+    # O workflow só será executado se o Pull Request for direcionado a uma das branches listadas.
+    # Isso é útil para ter pipelines diferentes para PRs direcionados a 'main' vs. 'develop', por exemplo.
+    branches:
+      - main
+      - 'develop'
+      - 'release/**' # Também funciona com wildcards para branches de release
+
+# Jobs que o workflow executará
+jobs:
+  # Nome do job
+  validate-pr-on-specific-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Exibe informações do Pull Request
+        run: |
+          echo "Workflow acionado por um Pull Request."
+          echo "Este job só executa para PRs direcionados a 'main', 'develop' ou 'release/**'."
+          echo "Branch de Origem (head): ${{ github.head_ref }}"
+          echo "Branch de Destino (base): ${{ github.base_ref }}"

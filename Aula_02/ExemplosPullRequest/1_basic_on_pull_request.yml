@@ -1,0 +1,33 @@
+# Nome do Workflow
+name: Aula 02 - Exemplo Básico de Pull Request
+
+# Gatilho (Trigger):
+on:
+  # O gatilho 'pull_request' é um pilar da Integração Contínua (CI).
+  # Ele executa o workflow sempre que um evento de Pull Request ocorre.
+  # Os eventos mais comuns são 'opened' (quando um PR é aberto), 'synchronize' (quando novos commits são adicionados ao PR) e 'reopened'.
+  # Isso permite validar o código (rodar testes, linters, etc.) ANTES que ele seja mesclado na branch principal.
+  pull_request:
+    # Assim como no 'push', podemos filtrar por branches.
+    # No contexto de um pull_request, o filtro se aplica à branch de DESTINO do PR.
+    # Este workflow só será executado para Pull Requests que têm a branch 'main' como destino.
+    branches:
+      - main
+
+# Jobs que o workflow executará
+jobs:
+  # Nome do job
+  validate-pr:
+    # Máquina virtual onde o job será executado
+    runs-on: ubuntu-latest
+
+    # Passos (steps) que o job executará em sequência
+    steps:
+      - name: Exibe informações do Pull Request
+        run: |
+          echo "Workflow acionado por um Pull Request."
+          # O contexto 'github' contém informações sobre o evento que acionou o workflow.
+          # Aqui, estamos acessando o número do PR, a branch de origem (head) e a branch de destino (base).
+          echo "PR Número: ${{ github.event.pull_request.number }}"
+          echo "Branch de Origem (head): ${{ github.head_ref }}"
+          echo "Branch de Destino (base): ${{ github.base_ref }}"

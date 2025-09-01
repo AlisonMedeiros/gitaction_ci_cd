@@ -1,0 +1,32 @@
+# Nome do Workflow
+name: Aula 02 - Exemplo de Dispatch com Input (Choice)
+
+# Gatilho (Trigger):
+on:
+  workflow_dispatch:
+    # A chave 'inputs' permite definir campos que o usuário pode preencher
+    # ao acionar o workflow manualmente. Isso torna o pipeline interativo.
+    inputs:
+      # 'environment' é o ID do nosso input. Usaremos este ID para acessá-lo no job.
+      environment:
+        # 'description' é o texto que aparecerá para o usuário na interface do GitHub.
+        description: 'Ambiente para o qual o deploy será feito'
+        # 'required' define se o preenchimento deste campo é obrigatório.
+        required: true
+        # 'default' é o valor que virá pré-selecionado.
+        default: 'staging'
+        # 'type: choice' cria uma lista de opções para o usuário escolher.
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy para o ambiente escolhido
+        run: |
+          echo "Iniciando deploy para o ambiente: ${{ github.event.inputs.environment }}"
+          # Em um cenário real, aqui você teria um passo condicional ou um script
+          # que usa o valor de 'github.event.inputs.environment' para se conectar ao servidor correto.

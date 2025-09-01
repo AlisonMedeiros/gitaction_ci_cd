@@ -1,0 +1,47 @@
+name: 2. Types on Workflow Run
+
+# Este workflow demonstra o uso do filtro `types` no gatilho `workflow_run`.
+# O filtro `types` permite que você execute jobs em diferentes estágios do ciclo de vida
+# de um outro workflow, e não apenas quando ele termina.
+#
+# Casos de uso comuns:
+# - Enviar uma notificação para o Slack quando um deploy é INICIADO (`requested`).
+# - Enviar uma segunda notificação com o resultado (sucesso/falha) quando o deploy é CONCLUÍDO (`completed`).
+# - Registrar logs ou métricas em diferentes pontos da execução de um pipeline crítico.
+on:
+  workflow_run:
+    # O nome do workflow que acionará este.
+    # IMPORTANTE: Substitua pelo nome exato do seu workflow de CI.
+    workflows: ["Meu Primeiro Workflow de CI"]
+
+    # A chave 'types' especifica os eventos do ciclo de vida do workflow alvo que acionarão este.
+    # Se esta chave não for usada, o GitHub Actions usa o valor padrão: ['completed'].
+    # Ao especificar os tipos, você ganha um controle mais granular.
+    types:
+      - requested  # Aciona no momento em que o workflow alvo é enfileirado para execução.
+      - completed  # Aciona quando o workflow alvo termina (seja com sucesso, falha, cancelado, etc.).
+
+jobs:
+  # Este job é projetado para rodar quando o workflow alvo é SOLICITADO.
+  on-requested:
+    runs-on: ubuntu-latest
+    # A condição `if` é crucial aqui. Ela verifica o campo `action` do evento `workflow_run`.
+    # O valor de `github.event.action` corresponderá ao `type` que acionou a execução.
+    # Neste caso, o job só executa se o evento foi 'requested'.
+    if: ${{ github.event.action == 'requested' }}
+    steps:
+      - name: Ação quando o workflow é solicitado
+        run: echo "🔔 O workflow '${{ github.event.workflow_run.workflow.name }}' foi solicitado e está prestes a começar."
+
+  # Este job é projetado para rodar quando o workflow alvo é CONCLUÍDO.
+  on-completed:
+    runs-on: ubuntu-latest
+    # Da mesma forma, este job só executa se o evento que o acionou foi 'completed'.
+    if: ${{ github.event.action == 'completed' }}
+    steps:
+      - name: Ação quando o workflow é concluído
+        run: |
+          echo "🏁 O workflow '${{ github.event.workflow_run.workflow.name }}' foi concluído."
+          # Quando a ação é 'completed', podemos acessar o resultado final do workflow alvo
+          # através de `github.event.workflow_run.conclusion`.
+          echo "Resultado final: ${{ github.event.workflow_run.conclusion }}"

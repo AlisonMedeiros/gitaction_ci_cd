@@ -1,0 +1,50 @@
+# Nome do Workflow
+name: Aula 02 - Exemplo Completo de Dispatch com Inputs
+
+# Gatilho (Trigger):
+on:
+  workflow_dispatch:
+    # Este é um exemplo completo que combina múltiplos tipos de inputs
+    # para criar um formulário de execução manual robusto e interativo.
+    inputs:
+      # Input do tipo 'choice' para selecionar um ambiente de uma lista predefinida.
+      environment:
+        description: 'Ambiente de destino do deploy'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+        default: 'staging'
+
+      # Input do tipo 'string' para o usuário fornecer um texto livre, como a versão.
+      version:
+        description: 'Tag da versão para deploy (ex: 1.2.0)'
+        required: true
+        type: string
+
+      # Input do tipo 'boolean' para uma ação opcional de ligar/desligar.
+      run_cleanup:
+        description: 'Executar limpeza de cache após o deploy?'
+        required: true
+        type: boolean
+        default: false
+
+jobs:
+  deploy-and-log:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Exibe os parâmetros de execução
+        run: |
+          echo "🚀 Iniciando deploy..."
+          echo "Ambiente: ${{ github.event.inputs.environment }}"
+          echo "Versão: ${{ github.event.inputs.version }}"
+          echo "Limpeza de cache solicitada: ${{ github.event.inputs.run_cleanup }}"
+
+      - name: Passo de Deploy (Simulação)
+        run: echo "Fazendo deploy da versão ${{ github.event.inputs.version }} para o ambiente ${{ github.event.inputs.environment }}..."
+
+      - name: Passo de Limpeza de Cache (Condicional)
+        # Este passo só será executado se a caixa 'run_cleanup' foi marcada pelo usuário.
+        if: github.event.inputs.run_cleanup == true
+        run: echo "🧹 Executando a limpeza de cache..."

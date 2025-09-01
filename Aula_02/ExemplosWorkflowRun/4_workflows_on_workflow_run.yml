@@ -1,0 +1,40 @@
+name: 4. Multiple Workflows on Workflow Run
+
+# Este workflow demonstra um dos recursos mais poderosos do gatilho `workflow_run`:
+# a capacidade de ser acionado por MÚLTIPLOS workflows diferentes.
+# A chave `workflows` aceita uma lista de nomes de workflows. Este workflow
+# será iniciado sempre que QUALQUER UM dos workflows listados for concluído.
+#
+# Casos de uso principais:
+# - Monorepo: Um único workflow de "Deploy" que pode ser acionado tanto pelo
+#   workflow de CI do "Backend" quanto pelo de CI do "Frontend".
+# - Notificação Centralizada: Um único workflow que envia um relatório de status
+#   para uma equipe sempre que qualquer um dos pipelines críticos do projeto terminar.
+# - Agregação de Artefatos: Um workflow que é acionado por vários workflows de build
+#   para coletar todos os artefatos e empacotá-los em uma única release.
+
+on:
+  workflow_run:
+    # AQUI ESTÁ A CHAVE: Lista de Workflows
+    # Este workflow será acionado pela conclusão de QUALQUER um dos workflows abaixo.
+    # IMPORTANTE: Substitua pelos nomes exatos dos seus workflows.
+    workflows:
+      - "Meu Primeiro Workflow de CI"
+      - "Outro Workflow Importante" # Exemplo de um segundo workflow
+
+    # O evento que aciona. 'completed' significa que ele rodará após o outro workflow terminar.
+    types:
+      - completed
+
+jobs:
+  # Este job é um exemplo de uma ação centralizada.
+  centralized-action:
+    runs-on: ubuntu-latest
+    # A boa prática é sempre verificar se o workflow de origem foi concluído com sucesso.
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Identificar o workflow de origem e agir
+        run: |
+          # Podemos usar o contexto do evento para saber qual workflow nos acionou.
+          echo "O workflow '${{ github.event.workflow_run.workflow.name }}' foi concluído com sucesso."
+          echo "Iniciando ação centralizada (ex: notificação, deploy, etc.)."

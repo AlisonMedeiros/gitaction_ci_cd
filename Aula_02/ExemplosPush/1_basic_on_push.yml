@@ -1,0 +1,26 @@
+# Nome do Workflow
+name: Aula 02 - Exemplo Básico de Push
+
+# Gatilho (Trigger):
+on:
+  # A configuração 'on: push:' é a forma mais simples e abrangente de usar o gatilho de push.
+  # Sem filtros adicionais, este workflow será acionado sempre que um commit for enviado (`git push`)
+  # para QUALQUER branch do repositório.
+  # É um ótimo ponto de partida, mas em projetos reais, geralmente adicionamos filtros
+  # para controlar a execução, como veremos nos próximos exemplos.
+  push:
+
+# Jobs que o workflow executará
+jobs:
+  # Nome do job
+  log-push-info:
+    # Máquina virtual onde o job será executado
+    runs-on: ubuntu-latest
+
+    # Passos (steps) que o job executará em sequência
+    steps:
+      - name: Exibe informações do evento de push
+        run: |
+          echo "Este workflow foi acionado por um evento de 'push'."
+          echo "O commit foi enviado para a branch: ${{ github.ref }}"
+          echo "SHA do commit: ${{ github.sha }}"

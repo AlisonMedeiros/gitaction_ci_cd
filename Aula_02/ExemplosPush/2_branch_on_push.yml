@@ -1,0 +1,30 @@
+# Nome do Workflow
+name: Aula 02 - Exemplo de Push em Branches Específicas
+
+# Gatilho (Trigger):
+on:
+  push:
+    # A chave 'branches' funciona como um filtro, uma "lista de permissão" (allow list).
+    # O workflow só será acionado se o push ocorrer em uma branch que corresponda
+    # a um dos nomes ou padrões definidos nesta lista.
+    # Isso nos dá controle total para executar pipelines de CI/CD apenas onde faz sentido,
+    # como na branch principal ou em branches de desenvolvimento de funcionalidades.
+    branches:
+      - main          # Executa em pushes para a branch 'main'
+      - 'feature/**'  # O padrão '**' é um curinga (wildcard) que corresponde a qualquer sequência de caracteres.
+                      # Isso significa que o workflow será acionado para qualquer branch que comece com 'feature/',
+                      # como 'feature/login', 'feature/user-profile', ou 'feature/payment/new-gateway'.
+
+# Jobs que o workflow executará
+jobs:
+  # Nome do job
+  log-branch-info:
+    # Máquina virtual onde o job será executado
+    runs-on: ubuntu-latest
+
+    # Passos (steps) que o job executará em sequência
+    steps:
+      - name: Exibe informações da branch
+        run: |
+          echo "Workflow acionado por um push na branch: ${{ github.ref_name }}"
+          echo "Este job só executa em 'main' ou em branches 'feature/**'."

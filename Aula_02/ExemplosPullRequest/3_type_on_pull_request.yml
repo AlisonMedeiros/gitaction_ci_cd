@@ -1,0 +1,37 @@
+# Nome do Workflow
+name: Aula 02 - Exemplo de PR com Filtro de Tipo
+
+# Gatilho (Trigger):
+on:
+  pull_request:
+    # A chave 'types' permite especificar QUAIS eventos dentro de um Pull Request devem acionar o workflow.
+    # Por padrão, se 'types' não for especificado, o gatilho de pull_request roda em 'opened', 'synchronize', e 'reopened'.
+    # Usando 'types', podemos ser mais específicos e reagir a mais eventos, como a adição de um rótulo (label).
+    types:
+      - opened         # Aciona quando o PR é aberto pela primeira vez.
+      - synchronize    # Aciona quando novos commits são enviados para a branch do PR.
+      - reopened       # Aciona quando um PR fechado é reaberto.
+      - ready_for_review # Aciona quando um PR em modo 'draft' (rascunho) é marcado como pronto para revisão.
+      - labeled        # Aciona quando um rótulo (label) é adicionado ao PR.
+
+    # É uma boa prática combinar o filtro de 'types' com o de 'branches' para ter um controle completo.
+    branches:
+      - main
+
+jobs:
+  log-pr-event-type:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log event details
+        run: |
+          echo "Workflow acionado por um Pull Request para a branch 'main'."
+          # A variável de contexto 'github.event.action' contém o tipo de evento que acionou o workflow (ex: 'opened', 'labeled').
+          echo "O tipo de evento que acionou este job foi: ${{ github.event.action }}"
+
+      - name: Ação específica para o evento 'labeled'
+        # A condição 'if' garante que este passo só será executado se o workflow foi acionado pela adição de um rótulo.
+        if: github.event.action == 'labeled'
+        run: |
+          echo "Um rótulo foi adicionado!"
+          # Podemos acessar informações específicas do evento, como o nome do rótulo.
+          echo "O rótulo adicionado foi: ${{ github.event.label.name }}"

@@ -1,0 +1,29 @@
+# Nome do Workflow
+name: Aula 02 - Exemplo de Dispatch com Input (String)
+
+# Gatilho (Trigger):
+on:
+  workflow_dispatch:
+    # A chave 'inputs' permite definir campos que o usuário pode preencher
+    # ao acionar o workflow manualmente.
+    inputs:
+      # 'log_message' é o ID do nosso input. Usaremos este ID para acessá-lo no job.
+      log_message:
+        # 'description' é o texto que aparecerá para o usuário na interface do GitHub.
+        description: 'Mensagem personalizada para registrar no log'
+        # 'required' define se o preenchimento deste campo é obrigatório.
+        required: true
+        # 'type: string' cria um campo de texto livre para o usuário digitar qualquer valor.
+        type: string
+        # 'default' é o valor que virá pré-preenchido no campo de texto.
+        default: 'Execução manual padrão'
+
+jobs:
+  log:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Exibe a mensagem do input
+        run: |
+          echo "A mensagem fornecida pelo usuário foi:"
+          # Acessamos o valor do input através do contexto 'github.event.inputs' seguido do ID do input.
+          echo "${{ github.event.inputs.log_message }}"

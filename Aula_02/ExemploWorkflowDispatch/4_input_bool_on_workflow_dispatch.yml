@@ -1,0 +1,37 @@
+# Nome do Workflow
+name: Aula 02 - Exemplo de Dispatch com Input (Boolean)
+
+# Gatilho (Trigger):
+on:
+  workflow_dispatch:
+    # A chave 'inputs' permite definir campos que o usuário pode preencher
+    # ao acionar o workflow manualmente.
+    inputs:
+      # 'run_tests' é o ID do nosso input.
+      run_tests:
+        # 'description' é o texto que aparecerá para o usuário na interface do GitHub.
+        description: 'Executar os testes de integração?'
+        # 'required' é opcional para booleanos, mas bom para clareza.
+        required: true
+        # 'type: boolean' cria uma caixa de seleção (checkbox) para o usuário marcar ou desmarcar.
+        type: boolean
+        # 'default' define se a caixa virá marcada (true) ou desmarcada (false) por padrão.
+        default: true
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Passo de Build
+        run: |
+          echo "Iniciando o processo de build..."
+          echo "Este passo sempre será executado."
+
+      - name: Passo de Teste Condicional
+        # A condição 'if' avalia a expressão. Se for verdadeira, o passo é executado.
+        # Acessamos o valor do input booleano através do contexto 'github.event.inputs'.
+        # O valor será 'true' se a caixa foi marcada, e 'false' caso contrário.
+        if: github.event.inputs.run_tests == true
+        run: |
+          echo "A opção para rodar testes foi marcada!"
+          echo "Executando os testes de integração..."
