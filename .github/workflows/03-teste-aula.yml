@@ -1,0 +1,149 @@
+name: 03 - Teste Aula
+
+on:
+  push:
+    branches: [ aula-teste ]
+  workflow_dispatch:
+
+env:
+  NOME_BRANCH: "aula-teste"
+  AMBIENTE: "teste"
+  VERSAO: "0.1.0"
+  DATA_TESTE: ${{ format('{0:yyyy-MM-dd HH:mm:ss}', github.event.head_commit.timestamp) }}
+
+jobs:
+  teste-aula:
+    runs-on: ubuntu-latest
+    
+    env:
+      JOB_ID: "teste-aula-001"
+      TIMESTAMP: ${{ github.event.head_commit.timestamp }}
+    
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+        
+      - name: Exibir informações da branch
+        run: |
+          echo "🎯 === INFORMAÇÕES DA BRANCH ==="
+          echo "Branch atual: ${{ github.ref_name }}"
+          echo "Repositório: ${{ github.repository }}"
+          echo "Usuário: ${{ github.actor }}"
+          echo "Evento: ${{ github.event_name }}"
+          echo "Workflow: ${{ github.workflow }}"
+          echo "Run ID: ${{ github.run_id }}"
+          
+      - name: Exibir variáveis de ambiente
+        run: |
+          echo "🔧 === VARIÁVEIS DE AMBIENTE ==="
+          echo "Nome da Branch: ${{ env.NOME_BRANCH }}"
+          echo "Ambiente: ${{ env.AMBIENTE }}"
+          echo "Versão: ${{ env.VERSAO }}"
+          echo "Data do Teste: ${{ env.DATA_TESTE }}"
+          echo "Job ID: ${{ env.JOB_ID }}"
+          echo "Timestamp: ${{ env.TIMESTAMP }}"
+          
+      - name: Criar arquivo de teste
+        run: |
+          echo "📝 === CRIANDO ARQUIVO DE TESTE ==="
+          cat > teste-aula.txt << EOF
+          ========================================
+          ARQUIVO DE TESTE - BRANCH AULA-TESTE
+          ========================================
+          
+          Informações do Teste:
+          - Branch: ${{ github.ref_name }}
+          - Repositório: ${{ github.repository }}
+          - Usuário: ${{ github.actor }}
+          - Data: ${{ env.DATA_TESTE }}
+          - Commit: ${{ github.sha }}
+          - Workflow: ${{ github.workflow }}
+          - Job ID: ${{ env.JOB_ID }}
+          
+          Variáveis de Ambiente:
+          - NOME_BRANCH: ${{ env.NOME_BRANCH }}
+          - AMBIENTE: ${{ env.AMBIENTE }}
+          - VERSAO: ${{ env.VERSAO }}
+          
+          Status: ✅ Teste executado com sucesso!
+          ========================================
+          EOF
+          
+          echo "Arquivo criado:"
+          cat teste-aula.txt
+          
+      - name: Listar arquivos do repositório
+        run: |
+          echo "📁 === ARQUIVOS DO REPOSITÓRIO ==="
+          ls -la
+          echo ""
+          echo "📂 Conteúdo do diretório .github/workflows:"
+          ls -la .github/workflows/
+          
+      - name: Teste de variáveis condicionais
+        run: |
+          echo "🎲 === TESTE DE VARIÁVEIS CONDICIONAIS ==="
+          
+          # Teste baseado na branch
+          if [ "${{ github.ref_name }}" = "aula-teste" ]; then
+            echo "✅ Executando na branch correta: aula-teste"
+          else
+            echo "❌ Executando em branch incorreta: ${{ github.ref_name }}"
+          fi
+          
+          # Teste baseado no evento
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "✅ Evento: push"
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "✅ Evento: workflow_dispatch (manual)"
+          else
+            echo "❓ Evento: ${{ github.event_name }}"
+          fi
+          
+      - name: Criar relatório final
+        run: |
+          echo "📊 === RELATÓRIO FINAL ==="
+          cat > relatorio-teste.json << EOF
+          {
+            "branch": "${{ github.ref_name }}",
+            "repositorio": "${{ github.repository }}",
+            "usuario": "${{ github.actor }}",
+            "evento": "${{ github.event_name }}",
+            "workflow": "${{ github.workflow }}",
+            "run_id": "${{ github.run_id }}",
+            "commit": "${{ github.sha }}",
+            "data_teste": "${{ env.DATA_TESTE }}",
+            "ambiente": "${{ env.AMBIENTE }}",
+            "versao": "${{ env.VERSAO }}",
+            "status": "sucesso",
+            "arquivos_criados": [
+              "teste-aula.txt",
+              "relatorio-teste.json"
+            ]
+          }
+          EOF
+          
+          echo "Relatório criado:"
+          cat relatorio-teste.json
+          
+      - name: Upload arquivos de teste
+        uses: actions/upload-artifact@v3
+        with:
+          name: arquivos-teste-aula
+          path: |
+            teste-aula.txt
+            relatorio-teste.json
+          
+      - name: Mensagem de sucesso
+        run: |
+          echo "🎉 === TESTE CONCLUÍDO COM SUCESSO! ==="
+          echo "✅ Branch: ${{ github.ref_name }}"
+          echo "✅ Workflow: ${{ github.workflow }}"
+          echo "✅ Usuário: ${{ github.actor }}"
+          echo "✅ Data: ${{ env.DATA_TESTE }}"
+          echo ""
+          echo "📁 Arquivos criados:"
+          echo "   - teste-aula.txt"
+          echo "   - relatorio-teste.json"
+          echo ""
+          echo "🚀 Próximo passo: Verificar os artifacts no GitHub!"
