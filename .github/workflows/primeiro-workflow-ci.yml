@@ -1,0 +1,23 @@
+name: Meu Primeiro Workflow de CI
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - 'README.md'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Exibir RA e Nome
+        run: |
+          echo "RA: 6324005 - NOME: Alison Medeiros"
+        
+      - name: Mostra o diretório de trabalho
+        run: pwd
+        
+      - name: Imprimir Nome do Repositório
+        run: |
+          echo "Nome do Repositório: ${{ github.repository }}"

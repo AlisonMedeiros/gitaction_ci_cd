@@ -23,7 +23,7 @@ jobs:
     # Variáveis específicas do job
     env:
       JOB_ID: "exemplo-001"
-      DATA_EXECUCAO: ${{ format('{0:yyyy-MM-dd HH:mm:ss}', github.event.head_commit.timestamp) }}
+      DATA_EXECUCAO: ${{ github.event.head_commit.timestamp || '' }}
     
     steps:
       - name: Checkout do código
