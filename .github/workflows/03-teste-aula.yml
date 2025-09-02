@@ -127,7 +127,7 @@ jobs:
           cat relatorio-teste.json
           
       - name: Upload arquivos de teste
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: arquivos-teste-aula
           path: |
